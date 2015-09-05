@@ -29,10 +29,10 @@ public class Twitter4JTesting {
     public static void main(String[] args) {
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true);
-        cb.setOAuthConsumerKey("----Consumer Key-----");
-        cb.setOAuthConsumerSecret("---Secret----");
-        cb.setOAuthAccessToken("---Token----");
-        cb.setOAuthAccessTokenSecret("----Token-----");
+        cb.setOAuthConsumerKey("P9sUs46f03m4xAJZzxt7Q");
+        cb.setOAuthConsumerSecret("Czw2g7QoURXz5WoLE8AbMounBiVAONktlQP1YleEy0");
+        cb.setOAuthAccessToken("182798423-gFyyrktqZmcrTu916G7zTkNX3pnTsB8Zc4s22dOc");
+        cb.setOAuthAccessTokenSecret("ITKJnDENspq5dVZIQMjTtG4NOj2ioT0QE2DkE9ZZA");
 
         TwitterStream twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
 
@@ -40,7 +40,7 @@ public class Twitter4JTesting {
 
         FilterQuery fq = new FilterQuery();
 
-        String keywords[] = {"messi"};
+        String keywords[] = {"Food"};
 
         fq.track(keywords);
 
