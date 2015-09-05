@@ -1,4 +1,4 @@
-# GodSu-and-3-bummers
+# Sorry, Gosu is a bummer..
 
 Oh no! What have I done?!
 
