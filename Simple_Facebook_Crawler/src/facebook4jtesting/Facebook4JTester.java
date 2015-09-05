@@ -1,23 +1,22 @@
 package facebook4jtesting;
 
-import facebook4j.Event;
+import java.io.File;
+
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
-import facebook4j.Group;
+import facebook4j.Page;
 import facebook4j.Post;
+import facebook4j.Reading;
 import facebook4j.ResponseList;
-import facebook4j.User;
 import facebook4j.conf.ConfigurationBuilder;
 
 /** This is an empty class **/
+/** You just got smoked! **/
 
 public class Facebook4JTester {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-		/** You just got smoked! **/
 		
 		ConfigurationBuilder cb = new ConfigurationBuilder();
 		cb.setDebugEnabled(true)
@@ -36,44 +35,73 @@ public class Facebook4JTester {
 		Facebook facebook = ff.getInstance();
 		
 		try {
-
-			/*ResponseList<Post> postResults = facebook.searchPosts("Food");*/
 			
-			ResponseList<User> userResults = facebook.searchUsers("Gosu Jin Yao");	
-			for(User u : userResults) {
+			// Make a directory in case it goes crazy..
+			// WARNING: You have been warned!!
+			new File("Results").mkdirs();
+			
+			StringBuilder sb = null;
+			String lineSep = System.getProperty("line.separator");
+			
+			String searchKey = "Singapore Food";
+			
+			ResponseList<Page> pageResults = facebook.searchPages(searchKey);
+			System.out.println("# of Returned Pages: " + pageResults.size());
+			
+			int validPages = 0;
+			
+			for(Page page : pageResults) {
 				
-				if(u.getName().equalsIgnoreCase("Gosu Jin Yao")) {
+				String pageID = page.getId();
+				String pageName = page.getName();
 				
-					System.out.println(u.getId());
-					System.out.println(u.getName());
-					System.out.println();
+				sb = new StringBuilder();
+				
+				sb.append("Search Term: ").append(searchKey).append(lineSep);
+				sb.append("Page ID: ").append(pageID).append(lineSep);
+				sb.append("Page Name: ").append(pageName).append(lineSep).append(lineSep);
+				
+				// Set limit to 100 (Maximum allowed by Facebook)
+				Reading reading = new Reading();
+				reading.limit(100);
+				
+				ResponseList<Post> pagePostResults = facebook.getFeed(pageID, reading);
+				
+				// Some page return no posts
+				if(pagePostResults.isEmpty())
+					continue;
+				
+				for(Post post : pagePostResults) {
+					
+					String postMessage = post.getMessage();
+					
+					// Some post has no message
+					if(postMessage == null)
+						continue;
+					
+					sb.append("Post ID: ").append(post.getId()).append(lineSep);
+					sb.append("Post Date/Time: ").append(post.getCreatedTime().toString());
+					sb.append(lineSep);
+					sb.append("Post Message:").append(lineSep).append(postMessage);
+					sb.append(lineSep).append(lineSep);
 				}
+				
+				// Replace all rubbish in page name
+				pageName = pageName.replaceAll("(\\W)+", "_");
+				pageName = pageName.replaceAll("(^(_)+|(_)+$)", "");
+				
+				// Write to file
+				String fileName = "Results\\" + pageID + "_" + pageName + ".txt";
+				FileIOHelper.writeToFile(sb.toString(), fileName);
+				
+				++validPages;
 			}
 			
-			/*ResponseList<Event> eventResults = facebook.searchEvents("Food");	
-			for(Event e : eventResults) {
-				
-				System.out.println(e.getId());
-				System.out.println(e.getName());
-				System.out.println(e.getLocation());
-				System.out.println();
-			}*/
+			System.out.println("# of Valid Pages (>= 1 Non-null post): " + validPages);
 			
-			ResponseList<Group> groupResults = facebook.searchGroups("NTU");
-			for(Group g : groupResults) {
-				
-				String gName = g.getName();
-				
-				if(gName.contains("Computer Science")) {
-				
-					System.out.println(g.getId());
-					System.out.println(g.getName());
-					System.out.println();
-				}
-			}
-			
-		} catch (FacebookException e) {
-			// TODO Auto-generated catch block
+		} catch (FacebookException e) {		
+			e.printStackTrace();
+		} catch (Exception e) {	
 			e.printStackTrace();
 		}
 	}
