@@ -40,7 +40,7 @@ public class Twitter4JTesting {
 
         FilterQuery fq = new FilterQuery();
 
-        String keywords[] = {"Food"};
+        String keywords[] = {"Singapore Food", "SGFood", "SG Food", "SG Foodie", "Food"};
 
         fq.track(keywords);
 

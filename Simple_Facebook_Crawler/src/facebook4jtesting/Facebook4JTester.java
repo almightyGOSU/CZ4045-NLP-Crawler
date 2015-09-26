@@ -1,6 +1,13 @@
 package facebook4jtesting;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
@@ -10,11 +17,16 @@ import facebook4j.Post;
 import facebook4j.Reading;
 import facebook4j.ResponseList;
 import facebook4j.conf.ConfigurationBuilder;
+import facebook4j.internal.org.json.JSONException;
+import facebook4j.internal.org.json.JSONObject;
 
 /** This is an empty class **/
 /** You just got smoked! **/
 
 public class Facebook4JTester {
+	
+	private static int _goodCount = 0;
+	private static int _badCount = 0;
 
 	public static void main(String[] args) {
 		
@@ -34,16 +46,19 @@ public class Facebook4JTester {
 		FacebookFactory ff = new FacebookFactory(cb.build());
 		Facebook facebook = ff.getInstance();
 		
+		ExecutorService executor = Executors.newFixedThreadPool(15);
+		
 		try {
 			
 			// Make a directory in case it goes crazy..
 			// WARNING: You have been warned!!
 			new File("Results").mkdirs();
 			
-			StringBuilder sb = null;
-			String lineSep = System.getProperty("line.separator");
+			/*StringBuilder sb = null;
+			String lineSep = System.getProperty("line.separator");*/
 			
-			String searchKey = "Singapore Food";
+			// Change searchKey to find a different keyword
+			String searchKey = "SingaporeFood";
 			
 			ResponseList<Page> pageResults = facebook.searchPages(searchKey);
 			System.out.println("# of Returned Pages: " + pageResults.size());
@@ -55,11 +70,15 @@ public class Facebook4JTester {
 				String pageID = page.getId();
 				String pageName = page.getName();
 				
-				sb = new StringBuilder();
+				// Replace all rubbish in page name
+				pageName = pageName.replaceAll("(\\W)+", "_");
+				pageName = pageName.replaceAll("(^(_)+|(_)+$)", "");
+				
+				/*sb = new StringBuilder();
 				
 				sb.append("Search Term: ").append(searchKey).append(lineSep);
 				sb.append("Page ID: ").append(pageID).append(lineSep);
-				sb.append("Page Name: ").append(pageName).append(lineSep).append(lineSep);
+				sb.append("Page Name: ").append(pageName).append(lineSep).append(lineSep);*/
 				
 				// Set limit to 100 (Maximum allowed by Facebook)
 				Reading reading = new Reading();
@@ -79,20 +98,27 @@ public class Facebook4JTester {
 					if(postMessage == null)
 						continue;
 					
-					sb.append("Post ID: ").append(post.getId()).append(lineSep);
+					final String finalMessage = postMessage;
+					
+					/*sb.append("Post ID: ").append(post.getId()).append(lineSep);
 					sb.append("Post Date/Time: ").append(post.getCreatedTime().toString());
 					sb.append(lineSep);
 					sb.append("Post Message:").append(lineSep).append(postMessage);
-					sb.append(lineSep).append(lineSep);
+					sb.append(lineSep).append(lineSep);*/
+					
+					executor.execute(new Thread() {
+						public void run() {
+							
+							postJSONContent(
+									"www.facebook.com/" + post.getId(),
+									finalMessage);
+							}
+						});
 				}
 				
-				// Replace all rubbish in page name
-				pageName = pageName.replaceAll("(\\W)+", "_");
-				pageName = pageName.replaceAll("(^(_)+|(_)+$)", "");
-				
-				// Write to file
+				/*// Write to file
 				String fileName = "Results\\" + pageID + "_" + pageName + ".txt";
-				FileIOHelper.writeToFile(sb.toString(), fileName);
+				FileIOHelper.writeToFile(sb.toString(), fileName);*/
 				
 				++validPages;
 			}
@@ -102,6 +128,68 @@ public class Facebook4JTester {
 		} catch (FacebookException e) {		
 			e.printStackTrace();
 		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+		
+		executor.shutdown();
+		
+		System.out.println("Good count: " + _goodCount);
+		System.out.println("Bad count: " + _badCount);
+	}
+	
+	public static void postJSONContent(String url, String content) {
+		
+		if("".equals(content))
+			return;
+		
+		content = content.replaceAll("é", "e");
+		content = content.replaceAll
+	    		  ("(https?://)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([/\\w \\.-]*)*/?","");
+		content = content.replaceAll
+	    		  ("\\$?\\d+((:|\\.|,)[0-9]+)?([a-zA-Z]+)?", "");
+		
+		try {
+			String baseUrl = "http://nlp.bcdy.tk/source";
+			URL object = new URL(baseUrl);
+	
+			HttpURLConnection con = (HttpURLConnection) object.openConnection();
+			con.setDoOutput(true);
+			con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+			con.setRequestMethod("POST");
+			con.setConnectTimeout(5000);
+	
+			JSONObject postContent = new JSONObject();
+	
+			postContent.put("Source", "Social");
+			postContent.put("URL", url);
+			postContent.put("Content", content);
+			
+			String finalString = postContent.toString();
+			finalString = finalString.replaceAll("\\P{Print}", "");
+	
+			OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+			wr.write(finalString);
+			wr.flush();
+	
+			int HttpResult = con.getResponseCode(); 
+			if(HttpResult == HttpURLConnection.HTTP_OK ||
+					HttpResult == HttpURLConnection.HTTP_CREATED){
+	
+				System.out.println("GOOD! " + finalString);
+				_goodCount++;
+				
+			} else {
+				
+			    System.out.println("NOT GOOD! " + finalString);
+			    _badCount++;
+			}
+		}
+		catch(SocketTimeoutException e) {
+			System.out.println("Socket Timeout!");
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 	}
