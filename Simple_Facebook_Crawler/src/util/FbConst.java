@@ -6,6 +6,4 @@ public class FbConst {
 	
 	public static final String [] KEYWORDS = {"SINGAPORE FOOD", "SG FOOD",
 		"SGFOOD", "SG FOODIE"};
-	
-	public static final String [] IGNORE_LIST = {"dog", "cat", "pet"};
 }

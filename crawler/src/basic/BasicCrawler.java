@@ -17,14 +17,12 @@
 
 package basic;
 
-import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.http.Header;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+
 import util.JSONHelper;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
@@ -45,16 +43,18 @@ public class BasicCrawler extends WebCrawler {
 	 */
 	@Override
 	public boolean shouldVisit(Page referringPage, WebURL url) {
+		
 		String href = url.getURL().toLowerCase();
+		
 		// Ignore the url if it has an extension that matches our defined set of
 		// image extensions.
 		if (IMAGE_EXTENSIONS.matcher(href).matches()) {
 			return false;
 		}
-
-		// Only accept the url if it is in the "www.ics.uci.edu" domain and
-		// protocol is "http".
-		return href.startsWith("http://www.ladyironchef.com/");
+		
+		// return href.startsWith("http://www.ladyironchef.com/");
+		
+		return href.startsWith("http://www.misstamchiak.com/");
 	}
 
 	/**
@@ -64,60 +64,64 @@ public class BasicCrawler extends WebCrawler {
 	@Override
 	public void visit(Page page) {
 
-		int docid = page.getWebURL().getDocid();
-		String url = page.getWebURL().getURL();
-		String domain = page.getWebURL().getDomain();
+		final String url = page.getWebURL().getURL();
 		String path = page.getWebURL().getPath();
+		
+		/*int docid = page.getWebURL().getDocid();
+		String domain = page.getWebURL().getDomain();
 		String subDomain = page.getWebURL().getSubDomain();
 		String parentUrl = page.getWebURL().getParentUrl();
-		String anchor = page.getWebURL().getAnchor();
+		String anchor = page.getWebURL().getAnchor();*/
 
-		/*
-		 * misstamchiak.com exclusion
-		 * if (path.contains("/category/") ||
-		 * path.contains("/tag/") || path.contains("/page/") ||
-		 * path.equals("/")) return;
-		 */
+		
+		// misstamchiak.com exclusion
+		if (path.contains("/category/") || path.contains("/tag/")
+				|| path.contains("/page/") || path.equals("/"))
+			return;
+		 
 
-		if (path.contains("/restaurants-index/") || path.contains("/contact/")
+		/*if (path.contains("/restaurants-index/") || path.contains("/contact/")
 				|| path.contains("/about/") || path.contains("/advertising/")
 				|| path.contains("/category/") || path.equals("/delicious/"))
-			return;
+			return;*/
 
-		System.out.println("DocID: " + docid);
+		/*System.out.println("DocID: " + docid);
 		System.out.println("URL: " + url);
 		System.out.println("Domain: " + domain);
 		System.out.println("Path: " + path);
 		System.out.println("SubDomain: " + subDomain);
 		System.out.println("ParentURL: " + parentUrl);
-		System.out.println("Anchor: " + anchor);
+		System.out.println("Anchor: " + anchor);*/
 
 		/*PrintWriter writer = null;
 		File dir = new File(domain);
 		dir.mkdir();*/
 
-		logger.debug("Docid: {}", docid);
+		/*logger.debug("Docid: {}", docid);
 		logger.info("URL: {}", url);
 		logger.debug("Domain: '{}'", domain);
 		logger.debug("Sub-domain: '{}'", subDomain);
 		logger.debug("Path: '{}'", path);
 		logger.debug("Parent page: {}", parentUrl);
-		logger.debug("Anchor text: {}", anchor);
+		logger.debug("Anchor text: {}", anchor);*/
 
 		if (page.getParseData() instanceof HtmlParseData) {
+			
 			HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
-			String text = htmlParseData.getText();
+			//String text = htmlParseData.getText();
 			String html = htmlParseData.getHtml();
 
 			Document doc = Jsoup.parse(html);
 			// doc.getElementById("comments").remove();
 
-			/*
-			 * misstamchiak.com content class Element content =
-			 * doc.select("div.par.post-content").first();
-			 */
-			Element content = doc.select("div.entry-content").first();
-			String textParsed = content.text();
+			
+			// misstamchiak.com content class
+			Element content = doc.select("div.par.post-content").first();
+			
+			/*// For ladyironchef content class
+			Element content = doc.select("div.entry-content").first();*/
+			
+			final String textParsed = content.text();
 
 			if (textParsed != null && !(textParsed.isEmpty())) {
 				/*
@@ -140,14 +144,14 @@ public class BasicCrawler extends WebCrawler {
 				JSONHelper.postJSONContent(url, textParsed);
 			}
 
-			Set<WebURL> links = htmlParseData.getOutgoingUrls();
+			/*Set<WebURL> links = htmlParseData.getOutgoingUrls();*/
 
-			logger.debug("Text length: {}", text.length());
+			/*logger.debug("Text length: {}", text.length());
 			logger.debug("Html length: {}", html.length());
-			logger.debug("Number of outgoing links: {}", links.size());
+			logger.debug("Number of outgoing links: {}", links.size());*/
 		}
 
-		Header[] responseHeaders = page.getFetchResponseHeaders();
+		/*Header[] responseHeaders = page.getFetchResponseHeaders();
 		if (responseHeaders != null) {
 			logger.debug("Response headers:");
 			for (Header header : responseHeaders) {
@@ -155,10 +159,10 @@ public class BasicCrawler extends WebCrawler {
 			}
 		}
 
-		logger.debug("=============");
+		logger.debug("=============");*/
 	}
 
-	public String cleanAwayUnicode(String content) {
+	/*public String cleanAwayUnicode(String content) {
 		Pattern p = Pattern.compile("\\\\u(\\p{XDigit}{4})");
 		Matcher m = p.matcher(content);
 		StringBuffer buf = new StringBuffer(content.length());
@@ -168,6 +172,5 @@ public class BasicCrawler extends WebCrawler {
 		}
 		m.appendTail(buf);
 		return buf.toString();
-
-	}
+	}*/
 }

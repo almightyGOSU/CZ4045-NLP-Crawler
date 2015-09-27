@@ -16,6 +16,9 @@ public class JSONHelper {
 	
 	public static void postJSONContent(String url, String content) {
 		
+		if(content == null)
+			return;
+		
 		if("".equals(content))
 			return;
 		

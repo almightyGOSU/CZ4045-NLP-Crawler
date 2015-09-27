@@ -43,7 +43,7 @@ public class Facebook4JTester {
 			for(String searchKey : FbConst.KEYWORDS) {
 			
 				ResponseList<Page> pageResults = facebook.searchPages(searchKey);
-				System.out.printf("# of Returned Pages for %s: %d%n",
+				System.out.printf("# of Returned Pages for '%s': %d%n",
 						searchKey, pageResults.size());
 				
 				int validPages = 0;
@@ -52,17 +52,6 @@ public class Facebook4JTester {
 					
 					String pageID = page.getId();
 					String pageName = page.getName();
-					
-					boolean bIgnorePage = false;
-					for(String ignoreStr : FbConst.IGNORE_LIST) {
-						if(pageName.toLowerCase().contains(ignoreStr)) {
-							bIgnorePage = true;
-							break;
-						}
-					}
-					
-					if(bIgnorePage)
-						continue;
 					
 					// Replace all rubbish in page name
 					pageName = pageName.replaceAll("(\\W)+", "_");
@@ -81,10 +70,6 @@ public class Facebook4JTester {
 					for(Post post : pagePostResults) {
 						
 						String postMessage = post.getMessage();
-						
-						// Some post has no message
-						if(postMessage == null)
-							continue;
 						
 						final String finalMessage = postMessage;
 						
@@ -111,7 +96,7 @@ public class Facebook4JTester {
 				JSONHelper.badCount = 0;
 			}
 			
-		} catch (FacebookException e) {		
+		} catch (FacebookException e) {
 			e.printStackTrace();
 		} catch (Exception e) {	
 			e.printStackTrace();
