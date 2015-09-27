@@ -1,11 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package twitter4jtesting;
 
 import com.GodSu.Library.Class.Twitter.CStreamListener;
+import com.GodSu.Util.TwitterConst;
+
 import java.util.Date;
+
 import twitter4j.FilterQuery;
 import twitter4j.GeoLocation;
 import twitter4j.Place;
@@ -21,12 +20,14 @@ import twitter4j.conf.ConfigurationBuilder;
 /**
  *
  */
+@SuppressWarnings("unused")
 public class Twitter4JTesting {
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+    	
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true);
         cb.setOAuthConsumerKey("P9sUs46f03m4xAJZzxt7Q");
@@ -40,7 +41,7 @@ public class Twitter4JTesting {
 
         FilterQuery fq = new FilterQuery();
 
-        String keywords[] = {"Singapore Food", "SGFood", "SG Food", "SG Foodie", "Food"};
+        String [] keywords = TwitterConst.KEYWORDS;
 
         fq.track(keywords);
 

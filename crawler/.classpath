@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="C:/Users/YongLun/workspace/crawler/crawler4j-4.1-jar-with-dependencies.jar"/>
-	<classpathentry kind="lib" path="C:/Users/YongLun/workspace/crawler/slf4j-jdk14-1.7.12.jar"/>
-	<classpathentry kind="lib" path="C:/Users/YongLun/workspace/crawler/jsoup-1.8.3.jar"/>
-	<classpathentry kind="lib" path="C:/Users/YongLun/workspace/crawler/java-json.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/crawler4j-4.1-jar-with-dependencies.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/java-json.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jsoup-1.8.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/slf4j-jdk14-1.7.12.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
