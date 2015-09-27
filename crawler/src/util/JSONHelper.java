@@ -38,7 +38,7 @@ public class JSONHelper {
 	
 			JSONObject postContent = new JSONObject();
 	
-			postContent.put("Source", "Social");
+			postContent.put("Source", "Web");
 			postContent.put("URL", url);
 			postContent.put("Content", content);
 			
