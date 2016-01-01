@@ -1,3 +1,5 @@
-# Facebook/Twitter/Web Crawlers for CZ4045 NLP Assignment
+# CZ4045 NLP Assignment
 
-All hail King Chody!
+- AY 2015/16 Semester 1
+- Facebook/Twitter/Web Crawlers for Corpus
+- All hail King Chody!
